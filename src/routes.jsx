@@ -34,6 +34,7 @@ import isFakeSubreddit, { randomSubs } from './lib/isFakeSubreddit';
 import makeRequest from './lib/makeRequest';
 import features from './featureflags';
 import { getVisitedPosts, setVisitedPosts } from './lib/visitedPosts';
+import { getVisitedSubreddits, setVisitedSubreddits } from './lib/visitedSubreddits';
 
 const config = defaultConfig;
 
@@ -381,6 +382,18 @@ function routes(app) {
       page: parseInt(this.query.page) || 0,
     });
 
+    if (props.subredditName) {
+      const data = props.data;
+
+      const user = data.get('loggedOutUser') || data.get('user');
+      Promise.all([user, data.get('subreddit')]).then(values => {
+        const username = values[0].body.name;
+        const subreddit = values[1].name;
+        const visited = getVisitedSubreddits(username);
+        const recentSubs = [subreddit].concat(visited);
+        setVisitedSubreddits(username, recentSubs);
+      });
+    }
 
     if (this.props.multi) {
       props.title = `m/${props.multi}`;
@@ -459,8 +472,13 @@ function routes(app) {
       commentId: ctx.params.commentId,
     });
 
-    const visited = getVisitedPosts();
-    setVisitedPosts([ctx.params.listingId].concat(visited));
+    const data = props.data;
+    const user = data.get('loggedOutUser') || data.get('user');
+    user.then(user => {
+      const username = user.body.name;
+      const visited = getVisitedPosts(username);
+      setVisitedPosts(username, ['t3_' + ctx.params.listingId].concat(visited));
+    });
 
     const commentsOpts = buildAPIOptions(ctx, {
       linkId: ctx.params.listingId,

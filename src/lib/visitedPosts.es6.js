@@ -2,18 +2,14 @@ import uniq from 'lodash/array/uniq';
 import cookies from 'cookies-js';
 
 import constants from '../constants';
-import localStorageAvailable from './localStorageAvailable';
-
 // Return an array of ids of the posts the user has visited recently.
 // Return [] if we are unable to access such a list.
 export function getVisitedPosts(username) {
-  const key = [username, constants.VISITED_POSTS_KEY].join('_');
-  const localStorageString = localStorageAvailable() ? global.localStorage.getItem(key) : '';
-  const localStorageArr = localStorageString ? localStorageString.split(',') : [];
+  const key = [username, constants.RECENT_CLICKS_KEY].join('_');
   const cookieString = cookies.enabled ? cookies.get(key) : '';
   const cookieArr = cookieString ? cookieString.split(',') : [];
 
-  return localStorageArr.concat(cookieArr);
+  return cookieArr;
 }
 
 // Stores the array of recently-visited post IDs.
@@ -21,21 +17,23 @@ export function getVisitedPosts(username) {
 // The posts should be provided in descending chronological order (most-recent
 // first), so that the implementation provides us with the most recently
 // visited posts.
-// If we cannot store the list (no localStorage), then this is a silent no-op.
-export function setVisitedPosts(username, posts) {
+// If we cannot store the list (cookies not enabled), then this is a silent no-op.
+export function setVisitedPosts(app, username, posts) {
   const visited = uniq(posts);
-  const visitedPostsKey = [username, constants.VISITED_POSTS_KEY].join('_');
-  const recentClicksCookie = [username, constants.RECENT_CLICKS_COOKIE].join('_');
+  const key = [username, constants.RECENT_CLICKS_KEY].join('_');
   const value = visited
-    .slice(0, constants.RECENT_CLICKS_LENGTH)
-    .join(',');
+                .slice(0, constants.RECENT_CLICKS_COUNT)
+                .join(',');
 
-  if (localStorageAvailable()) {
-    global.localStorage.setItem(visitedPostsKey, value);
-  }
-
+  const options = {
+    domain: app.getConfig('rootReddit'),
+    secure: app.getConfig('https'),
+    secureProxy: app.getConfig('httpsProxy'),
+    httpOnly: false,
+    maxAge: 1000 * 60 * 60 * 24 * 365 * 2,
+  };
   if (cookies.enabled) {
-    cookies.set(recentClicksCookie, value);
+    cookies.set(key, value, options);
   }
 }
 

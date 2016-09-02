@@ -41,14 +41,11 @@ export default {
     SUCCESS: 'success',
   },
 
-  VISITED_POST_COUNT: 20,
-  VISITED_POSTS_KEY: 'visitedPosts',
-
   RECENT_SUBREDDIT_COUNT: 10,
   RECENT_SUBREDDITS_KEY: 'recent_srs',
 
-  RECENT_CLICKS_COOKIE: 'recentclicks2',
-  RECENT_CLICKS_LENGTH: 5,
+  RECENT_CLICKS_COUNT: 5,
+  RECENT_CLICKS_KEY: 'recentclicks2',
 
   /* eslint-disable max-len */
   BANNER_URLS_TUNE: {

@@ -391,7 +391,7 @@ function routes(app) {
         const subreddit = values[1].name.toLowerCase();
         const visited = getVisitedSubreddits(username);
         const recentSubs = [subreddit].concat(visited);
-        setVisitedSubreddits(username, recentSubs);
+        setVisitedSubreddits(app, username, recentSubs);
       });
     }
 
@@ -477,7 +477,7 @@ function routes(app) {
     user.then(user => {
       const username = user.body.name;
       const visited = getVisitedPosts(username);
-      setVisitedPosts(username, ['t3_' + ctx.params.listingId].concat(visited));
+      setVisitedPosts(app, username, ['t3_' + ctx.params.listingId].concat(visited));
     });
 
     const commentsOpts = buildAPIOptions(ctx, {

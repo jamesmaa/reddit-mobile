@@ -387,8 +387,8 @@ function routes(app) {
 
       const user = data.get('loggedOutUser') || data.get('user');
       Promise.all([user, data.get('subreddit')]).then(values => {
-        const username = values[0].body.name;
-        const subreddit = values[1].name;
+        const username = values[0].body.name.toLowerCase();
+        const subreddit = values[1].name.toLowerCase();
         const visited = getVisitedSubreddits(username);
         const recentSubs = [subreddit].concat(visited);
         setVisitedSubreddits(username, recentSubs);

@@ -26,12 +26,6 @@ if (globalMessage) {
 function config() {
   const loginPath = process.env.LOGIN_PATH || '/oauth2/login';
   const registerPath = loginPath === '/login' ? '/register' : loginPath;
-  const reddit = process.env.REDDIT || 'https://www.reddit.com';
-  const rootReddit = reddit
-    .match(/https?:\/\/(.+)/)[1]
-    .split('.')
-    .splice(1,2)
-    .join('.');
 
   const reddit = process.env.REDDIT || 'https://www.reddit.com';
 

@@ -4,10 +4,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { METHODS } from '@r/platform/router';
-import { Form, Anchor } from '@r/platform/components';
+import { urlFromPage } from '@r/platform/pageUtils';
+import { Form, Anchor, BackAnchor } from '@r/platform/components';
 
 import * as sessionActions from 'app/actions/session';
 
+import OverlayModal from 'app/components/OverlayModal';
+import ForgotPassword from 'app/components/ForgotPassword';
 import SnooIcon from 'app/components/SnooIcon';
 import LoginInput from 'app/components/LoginRegistrationForm/Input';
 import SquareButton from 'app/components/LoginRegistrationForm/SquareButton';
@@ -19,6 +22,7 @@ class Login extends React.Component {
 
     this.state = {
       isPasswordField: true,
+      isForgotPassword: false,
       password: '',
       username: '',
     };
@@ -28,11 +32,19 @@ class Login extends React.Component {
     this.updatePassword = this.updateField.bind(this, 'password');
     this.updateUsername = this.updateField.bind(this, 'username');
     this.toggleEye = this.toggleEye.bind(this);
+    this.toggleForgotPassword = this.toggleForgotPassword.bind(this);
   }
 
   toggleEye() {
     const { isPasswordField } = this.state;
     this.setState({ isPasswordField: !isPasswordField });
+  }
+
+  toggleForgotPassword(e) {
+    const { isForgotPassword } = this.state;
+    e.preventDefault();
+    console.log('toggleForgotPassword ', isForgotPassword);
+    this.setState({ isForgotPassword: !isForgotPassword });
   }
 
   clearField(fieldName, e) {
@@ -44,6 +56,24 @@ class Login extends React.Component {
   updateField(fieldName, e) {
     e.preventDefault();
     this.setState({ [fieldName]: e.target.value });
+  }
+
+  getGoBackDest() {
+    const { platform } = this.props;
+    let i = platform.currentPageIndex - 1;
+    let prevPage = platform.history[i];
+    // Find the first url in history that isn't either login or register
+    while (i > 0 &&
+           (prevPage.url === '/login' || prevPage.url === '/register')) {
+      i--;
+      prevPage = platform.history[i];
+    }
+    // Found a valid page if the last page not equal login or regist
+    // else revert to frontpage
+    if (i > 0 && !(prevPage.url === '/login' || prevPage.url === '/register')) {
+      return urlFromPage(prevPage);
+    }
+    return '/';
   }
 
   renderClear(methodName) {
@@ -73,10 +103,19 @@ class Login extends React.Component {
     );
   }
 
+  renderForgotPasswordModal() {
+    return (
+      <OverlayModal close={ this.toggleForgotPassword }>
+        <ForgotPassword />
+      </OverlayModal>
+    );
+  }
+
   render() {
     const { session } = this.props;
-    const { isPasswordField, password, username } = this.state;
+    const { isForgotPassword, isPasswordField, password, username } = this.state;
     const passwordFieldType = isPasswordField ? 'password' : 'text';
+    const goBackDest = this.getGoBackDest();
     const errorType = session ? session.error : null;
 
     const error = { username: '', password: '' };
@@ -86,6 +125,13 @@ class Login extends React.Component {
 
     return (
       <div className='Login'>
+        { isForgotPassword && this.renderForgotPasswordModal() }
+        <div className='Register__header'>
+          <BackAnchor
+            className='Register__close icon icon-x'
+            href={ goBackDest }
+          />
+        </div>
         <SnooIcon />
         <div className='Login__register-link'>
           <p>
@@ -127,7 +173,10 @@ class Login extends React.Component {
               ? this.renderClear('clearPassword')
               : this.renderEye()
             }
-          </LoginInput >
+          </LoginInput>
+          <a onClick={ this.toggleForgotPassword }>
+            Forgot Password?
+          </a>
           <div className='Login__submit'>
             <SquareButton text='LOG IN' type='submit'/>
           </div>
@@ -139,7 +188,8 @@ class Login extends React.Component {
 
 const mapStateToProps = createSelector(
   state => state.session,
-  session => ({ session }),
+  state => state.platform,
+  (session, platform) => ({ session, platform }),
 );
 
 const mapDispatchToProps = (dispatch) => ({

@@ -1,18 +1,29 @@
 @import (reference) '~app/less/variables';
 @import (reference) '~app/less/themes/themeify';
 
-@size: @grid-size*6;
+@size: @grid-size*4;
 
 .Login, .Register {
   padding: @size;
   text-align: center;
   position: relative;
 
-  &:before {
+  &__close {
+    float: left;
+    color: @neutral;
+    font-size: 32px;
+    font-weight: 800;
+  }
+
+  &__header {
+    height: 30px;
+  }
+
+  .SnooIcon:before {
     content: '';
     position: absolute;
-    width: @size;
-    height: @size;
+    width: 1.5 * @size;
+    height: 1.5 * @size;
     background-color: @orangered;
     opacity: .75;
     border-radius: 100%;
@@ -20,8 +31,8 @@
 
   .SnooIcon {
     margin: auto;
-    height: @size;
-    width: @size;
+    height: 1.5 * @size;
+    width: 1.5 * @size;
     position: relative;
   }
 

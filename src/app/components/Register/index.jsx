@@ -2,7 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { METHODS } from '@r/platform/router';
-import { Anchor, Form } from '@r/platform/components';
+import { urlFromPage } from '@r/platform/pageUtils';
+import { BackAnchor, Anchor, Form } from '@r/platform/components';
 
 import config from 'config';
 import * as sessionActions from 'app/actions/session';
@@ -91,6 +92,7 @@ class Register extends React.Component {
     this.state = {
       username: '',
       password: '',
+      isPasswordField: true,
       email: '',
       gRecaptchaResponse: '',
     };
@@ -102,6 +104,12 @@ class Register extends React.Component {
     this.updatePassword = this.updateField.bind(this, 'password');
     this.updateEmail = this.updateField.bind(this, 'email');
     this.setRecaptchaResponse = this.setRecaptchaResponse.bind(this);
+    this.toggleEye = this.toggleEye.bind(this);
+  }
+
+  toggleEye() {
+    const { isPasswordField } = this.state;
+    this.setState({ isPasswordField: !isPasswordField });
   }
 
   clearField(fieldName, e) {
@@ -119,6 +127,39 @@ class Register extends React.Component {
     this.setState({ gRecaptchaResponse: value });
   }
 
+  getGoBackDest() {
+    const { platform } = this.props;
+    let i = platform.currentPageIndex - 1;
+    let prevPage = platform.history[i];
+    // Find the first url in history that isn't either login or register
+    while (i > 0 &&
+           (prevPage.url === '/login' || prevPage.url === '/register')) {
+      i--;
+      prevPage = platform.history[i];
+    }
+    // Found a valid page if the last page not equal login or regist
+    // else revert to frontpage
+    if (i > 0 && !(prevPage.url === '/login' || prevPage.url === '/register')) {
+      return urlFromPage(prevPage);
+    }
+    return '/';
+  }
+
+  renderEye() {
+    const { isPasswordField } = this.state;
+    const blue = isPasswordField ? '' : 'blue';
+
+    return (
+      <button
+        type='button'
+        className='Register__input-action-btn'
+        onClick={ this.toggleEye }
+      >
+        <span className={ `icon icon-eye ${blue}` } />
+      </button>
+    );
+  }
+
   renderClear(methodName) {
     return (
       <button
@@ -133,13 +174,20 @@ class Register extends React.Component {
 
   render() {
     const { error, theme } = this.props;
-    const { username, password, email, gRecaptchaResponse } = this.state;
+    const { username, password, isPasswordField, email, gRecaptchaResponse } = this.state;
+    const passwordFieldType = isPasswordField ? 'password' : 'text';
+    const goBackDest = this.getGoBackDest();
     const { recaptchaSitekey } = config;
-
     const captchaTheme = (theme === themes.DAYMODE) ? 'light' : 'dark';
 
     return (
       <div className='Register'>
+        <div className='Register__header'>
+          <BackAnchor
+            className='Register__close icon icon-x'
+            href={ goBackDest }
+          />
+        </div>
         <SnooIcon />
         <div className='Register__login-link'>
           <p>
@@ -162,15 +210,11 @@ class Register extends React.Component {
             onChange={ this.updateUsername }
             value={ username }
           >
-            {
-              error.username
-                ? this.renderClear('clearUsername')
-                : null
-            }
+            { error.username && this.renderClear('clearUsername') }
           </LoginInput>
           <LoginInput
             name='password'
-            type='password'
+            type={ passwordFieldType }
             placeholder='Choose a unique password'
             showTopBorder={ false }
             shouldAutocomplete={ false }
@@ -181,7 +225,7 @@ class Register extends React.Component {
             {
               error.password
                 ? this.renderClear('clearPassword')
-                : null
+                : this.renderEye()
             }
           </LoginInput>
           <LoginInput
@@ -193,11 +237,7 @@ class Register extends React.Component {
             onChange={ this.updateEmail }
             value={ email }
           >
-            {
-              error.email
-                ? this.renderClear('clearEmail')
-                : null
-            }
+            { error.email && this.renderClear('clearEmail') }
           </LoginInput>
           <label className='Register__checkbox-label'>
             <input
@@ -218,8 +258,8 @@ class Register extends React.Component {
             type='hidden'
             value={ gRecaptchaResponse }
           />
-          { error.captcha ? renderErrorMsg(error.captcha) : null }
-          { error.default ? renderErrorMsg(error.default) : null }
+          { error.captcha && renderErrorMsg(error.captcha) }
+          { error.default && renderErrorMsg(error.default) }
           <div className='Register__submit'>
             <SquareButton text='REGISTER' type='submit'/>
           </div>
@@ -260,9 +300,11 @@ const checkErrors = session => {
 
 const mapStateToProps = createSelector(
   state => state.theme,
+  state => state.platform,
   state => state.session,
-  (theme, session) => ({
+  (theme, platform, session) => ({
     theme,
+    platform,
     error: checkErrors(session),
   })
 );

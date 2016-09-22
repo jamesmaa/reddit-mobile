@@ -6,15 +6,17 @@ const T = React.PropTypes;
 const OverlayModal = props => {
   return (
     <section className='OverlayModal'>
-      <button
-        type='button'
-        className='OverlayModal__close'
-        onClick={ props.close }
-      >
-        &times;
-      </button>
       <div className='OverlayModal__body'>
-        { props.children }
+        <button
+          type='button'
+          className='OverlayModal__close'
+          onClick={ props.close }
+        >
+          &times;
+        </button>
+        <div className='OverlayModal__content'>
+          { props.children }
+        </div>
       </div>
       <div className='OverlayModal__backdrop' />
     </section>

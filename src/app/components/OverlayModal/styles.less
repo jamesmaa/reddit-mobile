@@ -1,0 +1,39 @@
+@import (reference) '~app/less/variables';
+@import (reference) '~app/less/themes/themeify';
+
+.OverlayModal {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  &__close {
+    position: absolute;
+    left: 5px;
+    top: 10px;
+    z-index: 9999;
+    font-size: 2.3em;
+  }
+
+  &__body {
+    position: relative;
+    max-width: 300px;
+    margin: 50px auto;
+    padding: 10px;
+    z-index: @zindex-modal;
+    background-color: @white
+  }
+
+  // Modal background
+  &__backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: @zindex-modal-background;
+    opacity: @modal-backdrop-opacity;
+    background-color: @modal-backdrop-bg;
+  }
+}

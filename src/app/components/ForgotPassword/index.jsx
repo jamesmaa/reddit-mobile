@@ -11,8 +11,11 @@ import SquareButton from 'app/components/LoginRegistrationForm/SquareButton';
 const EmailWarning = 'Unfortunately if you have never given us your email,' +
                      ' we will not be able to reset your password';
 
+const SUCCESS_MSG = 'We sent a password reset email associated with that ' +
+                    'account. Please check your inbox for instructions.';
 
 const ERRORS = {
+  EMPTY_INPUT: 'Please enter in a username',
   USER_DOESNT_EXIST: 'Sorry, this user does not exist.',
   NO_EMAIL_FOR_USER: 'Sorry, there is no email for this user.',
   RATELIMIT: 'Sorry, you are doing that too much.',
@@ -27,7 +30,9 @@ class ForgotPassword extends React.Component {
     super(props);
 
     this.state = {
+      error: null,
       name: '',
+      success: false,
     };
 
     this.submitForm = this.submitForm.bind(this);
@@ -44,6 +49,8 @@ class ForgotPassword extends React.Component {
 
     if (name) {
       this.requestReset(name);
+    } else {
+      this.setState({ error: 'EMPTY_INPUT' });
     }
   }
 
@@ -59,15 +66,10 @@ class ForgotPassword extends React.Component {
       const res = await this.makeRequest(config.nonAuthAPIOrigin + uri, postData);
 
       if (res) {
-        // show message
-        this.props.close();
+        this.setState({ success: true });
       }
     } catch (e) {
-      this.setState({
-        error: ERRORS[e.name] ||
-               ERRORS[e.status] ||
-               ERRORS.DEFAULT,
-      });
+      this.setState({ error: e.name || e.status || 'DEFAULT' });
     }
   }
 
@@ -99,7 +101,7 @@ class ForgotPassword extends React.Component {
   updateName(e) {
     const name = e ? e.target.value : '';
 
-    this.setState({ name, error: '' });
+    this.setState({ name, error: '', success: false });
   }
 
   renderClear() {
@@ -119,7 +121,7 @@ class ForgotPassword extends React.Component {
   }
 
   render() {
-    const { name, error } = this.state;
+    const { name, error, success } = this.state;
 
     return (
       <div>
@@ -131,11 +133,12 @@ class ForgotPassword extends React.Component {
             placeholder='Username'
             value={ name }
             onChange={ this.updateName }
-            error={ error }
+            error={ ERRORS[error] }
           >
             { error && this.renderClear() }
           </LoginInput>
           <p className='ForgotPassword__warning'>{ EmailWarning }</p>
+          { success && <p> { SUCCESS_MSG } </p> }
           <div className='ForgotPassword__button'>
             <SquareButton onClick={ this.submitForm } text='Email Password Reset' />
           </div>

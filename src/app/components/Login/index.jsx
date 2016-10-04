@@ -43,7 +43,6 @@ class Login extends React.Component {
   toggleForgotPassword(e) {
     const { isForgotPassword } = this.state;
     e.preventDefault();
-    console.log('toggleForgotPassword ', isForgotPassword);
     this.setState({ isForgotPassword: !isForgotPassword });
   }
 

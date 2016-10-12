@@ -2,8 +2,8 @@ import React from 'react';
 import './styles.less';
 
 import config from 'config';
-import { DEFAULT_API_TIMEOUT } from 'app/constants';
 import makeRequest from 'lib/makeRequest';
+import { PrivateAPI } from '@r/private';
 
 import LoginInput from 'app/components/LoginRegistrationForm/Input';
 import SquareButton from 'app/components/LoginRegistrationForm/SquareButton';
@@ -26,7 +26,7 @@ const ERRORS = {
 
 class ForgotPassword extends React.Component {
 
-  constructor(props) {
+  constructor = (props) => {
     super(props);
 
     this.state = {
@@ -35,17 +35,11 @@ class ForgotPassword extends React.Component {
       success: false,
     };
 
-    this.submitForm = this.submitForm.bind(this);
-    this.updateName = this.updateName.bind(this);
-    this.makeRequest = this.makeRequest.bind(this);
-    this.requestReset = this.requestReset.bind(this);
-    this.renderClear = this.renderClear.bind(this);
-    this.clear = this.clear.bind(this);
   }
 
-  submitForm(e) {
+  submitForm = e => {
     e.preventDefault();
-    const name = this.state.name;
+    const { name } = this.state;
 
     if (name) {
       this.requestReset(name);
@@ -54,16 +48,9 @@ class ForgotPassword extends React.Component {
     }
   }
 
-  async requestReset(name) {
+  async function requestReset(name) {
     try {
-      const uri = '/api/password.json';
-
-      const postData = {
-        name,
-        api_type: 'json',
-      };
-
-      const res = await this.makeRequest(config.nonAuthAPIOrigin + uri, postData);
+      const res = await PrivateAPI.forgotPassword(config.nonAuthAPIOrigin, postData);
 
       if (res) {
         this.setState({ success: true });
@@ -73,38 +60,13 @@ class ForgotPassword extends React.Component {
     }
   }
 
-  async makeRequest(uri, postData) {
-    try {
-      const res = await makeRequest
-        .post(uri)
-        .type('form')
-        .send(postData)
-        .timeout(DEFAULT_API_TIMEOUT)
-        .then();
-
-      const body = res.body;
-      if (body && body.json && body.json.errors && body.json.errors.length) {
-        const errArray = body.json.errors[0];
-        const error = new Error(errArray[1]);
-        error.name = errArray[0];
-        throw error;
-      }
-      return res.body;
-    } catch (e) {
-      if (e.timeout) {
-        e.name = 504;
-      }
-      throw e;
-    }
-  }
-
-  updateName(e) {
+  updateName = e => {
     const name = e ? e.target.value : '';
 
     this.setState({ name, error: '', success: false });
   }
 
-  renderClear() {
+  renderClear = () => {
     return (
       <button
         type='button'
@@ -116,11 +78,11 @@ class ForgotPassword extends React.Component {
     );
   }
 
-  clear() {
+  clear = () => {
     this.updateName(null);
   }
 
-  render() {
+  render = () => {
     const { name, error, success } = this.state;
 
     return (
@@ -135,10 +97,10 @@ class ForgotPassword extends React.Component {
             onChange={ this.updateName }
             error={ ERRORS[error] }
           >
-            { error && this.renderClear() }
+            { error ? this.renderClear() : null }
           </LoginInput>
           <p className='ForgotPassword__warning'>{ EmailWarning }</p>
-          { success && <p> { SUCCESS_MSG } </p> }
+          { success ? <p>{ SUCCESS_MSG }</p> : null }
           <div className='ForgotPassword__button'>
             <SquareButton onClick={ this.submitForm } text='Email Password Reset' />
           </div>

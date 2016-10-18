@@ -4,6 +4,7 @@ import './styles.less';
 import config from 'config';
 import makeRequest from 'lib/makeRequest';
 import { PrivateAPI } from '@r/private';
+import { Form } from '@r/platform/components';
 
 import LoginInput from 'app/components/LoginRegistrationForm/Input';
 import SquareButton from 'app/components/LoginRegistrationForm/SquareButton';
@@ -26,7 +27,7 @@ const ERRORS = {
 
 class ForgotPassword extends React.Component {
 
-  constructor = (props) => {
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -45,18 +46,6 @@ class ForgotPassword extends React.Component {
       this.requestReset(name);
     } else {
       this.setState({ error: 'EMPTY_INPUT' });
-    }
-  }
-
-  async function requestReset(name) {
-    try {
-      const res = await PrivateAPI.forgotPassword(config.nonAuthAPIOrigin, postData);
-
-      if (res) {
-        this.setState({ success: true });
-      }
-    } catch (e) {
-      this.setState({ error: e.name || e.status || 'DEFAULT' });
     }
   }
 
@@ -88,7 +77,7 @@ class ForgotPassword extends React.Component {
     return (
       <div>
         <h2 className='ForgotPassword__header'>Forgot Password</h2>
-        <form action='/resetpassword' method='POST' >
+        <Form action='/resetpassword' method='POST' >
           <LoginInput
             showTopBorder={ true }
             name='name'
@@ -104,7 +93,7 @@ class ForgotPassword extends React.Component {
           <div className='ForgotPassword__button'>
             <SquareButton onClick={ this.submitForm } text='Email Password Reset' />
           </div>
-        </form>
+        </Form>
       </div>
     );
   }

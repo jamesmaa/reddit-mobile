@@ -1,3 +1,4 @@
+import AdsPreviewHandler from './handlers/AdsPreview';
 import CommentsPageHandler from './handlers/CommentsPage';
 import CommunityGotoActionHandler from './handlers/CommunityGotoAction';
 import PostsFromSubredditHandler from './handlers/PostsFromSubreddit';
@@ -47,6 +48,9 @@ export default [
   ['/r/:subredditName/submit', PostSubmitHandler],
   ['/submit', PostSubmitHandler],
   ['/submit/to_community', PostSubmitCommunityHandler],
+
+  // Ads preview
+  ['/ads/preview', AdsPreviewHandler],
 
   // actions
   ['/actions/community-goto', CommunityGotoActionHandler],

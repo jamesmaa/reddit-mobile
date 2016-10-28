@@ -5,6 +5,7 @@ import { createSelector } from 'reselect';
 import { UrlSwitch, Page, Case } from '@r/platform/url';
 
 import CommentsPage from './Comments';
+import { AdPreview } from './AdPreview';
 import { PostsFromSubredditPage } from './PostsFromSubreddit';
 import { SavedAndHiddenPage } from './SavedAndHidden';
 import { SearchPage } from './SearchPage';
@@ -60,6 +61,7 @@ const AppMain = props => {
       <UrlSwitch>
         <Page url='/login' component={ Login } />
         <Page url='/register' component={ Register } />
+        <Page url='/ads/preview' component={ AdPreview } />
         <Page url='/message/messages/:threadId' component={ MessageThread } />
         <Page url='/r/:subredditName/submit' component={ PostSubmitModal } />
         <Page url='/submit' component={ PostSubmitModal } />

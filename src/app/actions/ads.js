@@ -92,16 +92,21 @@ export const fetchNewAdForPostsList = (postsListId, pageParams) =>
     const adRequest = state.adRequests[postsListId];
     if (adRequest && adRequest.loading) { return; }
 
-    const adId = nextAdId();
-
-    dispatch(fetching(adId, postsListId));
-
     const loadedState = getState();
     const postsList = loadedState.postsLists[postsListId];
     if (!postsList.results.length) {
       dispatch(failed(postsListId));
       return;
     }
+
+    const oldAd = loadedState.adRequests[postsList.adId];
+    // Don't fetch a new ad if one exists already
+    if (oldAd && !oldAd.pending && !oldAd.failed) {
+      return;
+    }
+
+    const adId = nextAdId();
+    dispatch(fetching(adId, postsListId));
 
     const { ad: specificAd } = pageParams.queryParams;
     if (specificAd) {

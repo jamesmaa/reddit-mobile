@@ -46,6 +46,13 @@ export const tracking = adId => ({
   adId,
 });
 
+export const COPY_AD = 'COPY_AD';
+export const copyAd = (newAdId, ad) => ({
+  type: COPY_AD,
+  newAdId,
+  ad,
+});
+
 export const track = adId => async (dispatch, getState) => {
   const state = getState();
   const adRequest = state.adRequests[adId];
@@ -89,32 +96,37 @@ const nextAdId = () => (uniqueId('ad_'));
 export const fetchNewAdForPostsList = (postsListId, pageParams) =>
   async (dispatch, getState) => {
     const state = getState();
-    const adRequest = state.adRequests[postsListId];
-    if (adRequest && adRequest.loading) { return; }
+    const postsList = state.postsLists[postsListId];
 
-    const loadedState = getState();
-    const postsList = loadedState.postsLists[postsListId];
-    if (!postsList.results.length) {
-      dispatch(failed(postsListId));
+    if (!postsList) {
       return;
     }
+    const adRequest = state.adRequests[postsList.adId];
 
-    const oldAd = loadedState.adRequests[postsList.adId];
-    // Don't fetch a new ad if one exists already
-    if (oldAd && !oldAd.pending && !oldAd.failed) {
+    if (adRequest && adRequest.pending) {
       return;
     }
 
     const adId = nextAdId();
     dispatch(fetching(adId, postsListId));
-
-    const { ad: specificAd } = pageParams.queryParams;
-    if (specificAd) {
-      await fetchSpecificAd(dispatch, loadedState, adId, specificAd);
+    if (adRequest && !adRequest.pending && !adRequest.failed) {
+      // Don't fetch a new ad if one exists already
+      dispatch(copyAd(adId, adRequest.ad));
       return;
     }
 
-    await fetchAddBasedOnResults(dispatch, loadedState, adId, postsList, pageParams);
+    if (!postsList.results.length) {
+      dispatch(failed(postsListId));
+      return;
+    }
+
+    const { ad: specificAd } = pageParams.queryParams;
+    if (specificAd) {
+      await fetchSpecificAd(dispatch, state, adId, specificAd);
+      return;
+    }
+
+    await fetchAddBasedOnResults(dispatch, state, adId, postsList, pageParams);
   };
 
 export const fetchSpecificAd = async (dispatch, state, adId, specificAd) => {

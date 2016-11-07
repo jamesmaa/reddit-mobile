@@ -69,6 +69,17 @@ export default function(state=DEFAULT, action={}) {
       });
     }
 
+    case adActions.COPY_AD: {
+      const { newAdId, ad } = action;
+      return merge(state, {
+        [newAdId ]: {
+          ad,
+          pending: false,
+          impressionTracked: false,
+        },
+      });
+    }
+
     default: return state;
   }
 }

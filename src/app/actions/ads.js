@@ -96,7 +96,7 @@ const nextAdId = () => (uniqueId('ad_'));
 export const fetchNewAdForPostsList = (postsListId, pageParams) =>
   async (dispatch, getState) => {
     const state = getState();
-    const postsList = state.postsLists[postsListId];
+    let postsList = state.postsLists[postsListId];
 
     if (!postsList) {
       return;
@@ -115,6 +115,8 @@ export const fetchNewAdForPostsList = (postsListId, pageParams) =>
       return;
     }
 
+    const loadedState = getState();
+    postsList = loadedState.postsLists[postsListId];
     if (!postsList.results.length) {
       dispatch(failed(postsListId));
       return;
@@ -122,11 +124,11 @@ export const fetchNewAdForPostsList = (postsListId, pageParams) =>
 
     const { ad: specificAd } = pageParams.queryParams;
     if (specificAd) {
-      await fetchSpecificAd(dispatch, state, adId, specificAd);
+      await fetchSpecificAd(dispatch, loadedState, adId, specificAd);
       return;
     }
 
-    await fetchAddBasedOnResults(dispatch, state, adId, postsList, pageParams);
+    await fetchAddBasedOnResults(dispatch, loadedState, adId, postsList, pageParams);
   };
 
 export const fetchSpecificAd = async (dispatch, state, adId, specificAd) => {

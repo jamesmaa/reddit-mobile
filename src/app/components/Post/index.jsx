@@ -41,6 +41,9 @@ Post.propTypes = {
   single: T.bool,
   userActivityPage: T.bool,
   z: T.number,
+  onClickPostDescriptor: T.func,
+  onClickTitle: T.func,
+  onClickComments: T.func,
   onToggleSavePost: T.func,
   onToggleHidePost: T.func,
   onReportPost: T.func.isRequired,
@@ -54,6 +57,9 @@ Post.defaultProps = {
   subredditIsNSFW: false,
   showOver18Interstitial: false,
   winWidth: 360,
+  onClickPostDescriptor: () => { console.log('stubbed click post descript'); },
+  onClickTitle: () => { console.log('stubbed click post title'); },
+  onClickComments: () => { console.log('stubbed click post comments'); },
   onToggleSavePost: () => {},
   onToggleHidePost: () => {},
 };
@@ -81,6 +87,9 @@ export function Post(props) {
     hideSubredditLabel,
     hideWhen,
     userActivityPage,
+    onClickPostDescriptor,
+    onClickTitle,
+    onClickComments,
     onToggleEdit,
     onToggleSavePost,
     onToggleHidePost,
@@ -161,6 +170,8 @@ export function Post(props) {
           showingLink={ !!(compact && !hasExpandedCompact && externalDomain) }
           renderMediaFullbleed={ renderMediaFullbleed }
           showLinksInNewTab={ showLinksInNewTab }
+          onClickPostDescriptor={ onClickPostDescriptor }
+          onClickTitle={ onClickTitle }
         />
       </div>
       { contentOrNil }
@@ -175,6 +186,7 @@ export function Post(props) {
         onToggleSave={ onToggleSavePost }
         onToggleHide={ onToggleHidePost }
         onReportPost={ onReportPost }
+        onClickComments={ onClickComments }
       />
     </article>
   );

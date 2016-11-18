@@ -20,6 +20,7 @@ export default function(state=DEFAULT, action={}) {
           pending: true,
           ad: undefined,
           impressionTracked: false,
+          clickTracked: false,
           failed: false,
         },
       });
@@ -54,7 +55,7 @@ export default function(state=DEFAULT, action={}) {
       });
     }
 
-    case adActions.TRACKING_AD: {
+    case adActions.TRACKING_AD_IMP: {
       const { adId } = action;
       // the ad tracking thunk'd action will be doing the side-effect necessary
       // for tracking the impression. We store this in state so the component
@@ -65,6 +66,17 @@ export default function(state=DEFAULT, action={}) {
       return merge(state, {
         [adId ]: {
           impressionTracked: true,
+        },
+      });
+    }
+
+    case adActions.TRACKING_AD_CLICK_POST_DESCRIPTOR:
+    case adActions.TRACKING_AD_CLICK_TITLE:
+    case adActions.TRACKING_AD_CLICK_COMMENTS: {
+      const { adId } = action;
+      return merge(state, {
+        [adId]: {
+          clickTracked: true,
         },
       });
     }

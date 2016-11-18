@@ -23,6 +23,9 @@ class Ad extends React.Component {
     adTracked: T.bool.isRequired,
     onAdMadeImpression: T.func.isRequired,
     onAdblockDetected: T.func.isRequired,
+    onClickPostDescriptor: T.func.isRequired,
+    onClickTitle: T.func.isRequired,
+    onClickComments: T.func.isRequired,
   };
 
   constructor(props) {
@@ -67,7 +70,15 @@ class Ad extends React.Component {
   }
 
   render() {
-    return <Post { ...this.props.postProps } />;
+    const { postProps, onClickPostDescriptor, onClickTitle, onClickComments } = this.props;
+    return (
+      <Post
+        { ...postProps }
+        onClickPostDescriptor={ onClickPostDescriptor }
+        onClickTitle={ onClickTitle }
+        onClickComments={ onClickComments }
+      />
+    );
   }
 }
 
@@ -77,8 +88,11 @@ const selector = createSelector(
 );
 
 const mapDispatchToProps = (dispatch, { adId, placementIndex }) => ({
-  onAdMadeImpression() { dispatch(adActions.track(adId)); },
+  onAdMadeImpression() { dispatch(adActions.trackImpression(adId)); },
   onAdblockDetected() { dispatch(adActions.trackAdHidden(placementIndex)); },
+  onClickPostDescriptor() { dispatch(adActions.trackClickPostDescriptor(adId)); },
+  onClickTitle() { dispatch(adActions.trackClickTitle(adId)); },
+  onClickComments() { dispatch(adActions.trackClickComments(adId)); },
 });
 
 export default connect(selector, mapDispatchToProps)(Ad);

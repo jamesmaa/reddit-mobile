@@ -64,6 +64,13 @@ PostHeader.propTypes = {
   showingLink: T.bool.isRequired,
   renderMediaFullbleed: T.bool.isRequired,
   showLinksInNewTab: T.bool.isRequired,
+  onClickPostDescriptor: T.func,
+  onClickTitle: T.func,
+};
+
+PostHeader.defaultProps = {
+  onClickPostDescriptor: () => { console.log('stubbed pup '); },
+  onClickTitle: () => {},
 };
 
 function postTextColorClass(distinguished) {
@@ -178,10 +185,11 @@ function renderPostFlair(post, single) {
   );
 }
 
-function renderPromotedUserPostDescriptor({ author, promotedUrl, promotedDisplayName }) {
+function renderPromotedUserPostDescriptor({ author, promotedUrl, promotedDisplayName }, onClickPostDescriptor) {
   const displayAuthor = promotedDisplayName || author;
   const urlProps = {
     className: 'PostHeader__promoted-user-post-line',
+    onClick: onClickPostDescriptor,
     href: promotedUrl,
     children: [
       <span className='PostHeader__megaphone blue icon icon-megaphone'/>,
@@ -209,6 +217,7 @@ function renderPostDescriptor(
   hideSubredditLabel,
   hideWhen,
   isPromotedUserPost,
+  onClickPostDescriptor,
 ) {
   const {
     distinguished,
@@ -228,7 +237,9 @@ function renderPostDescriptor(
   }
 
   const flairOrNil = renderLinkFlairText(post);
-  const promotedUserPostDescriptor = isPromotedUserPost && renderPromotedUserPostDescriptor(post);
+  const promotedUserPostDescriptor = isPromotedUserPost
+  ? renderPromotedUserPostDescriptor(post, onClickPostDescriptor)
+  : null;
   const normalPostDescriptor = renderWithSeparators([
     hideSubredditLabel && flairOrNil,
     postFlairOrNil,
@@ -297,7 +308,7 @@ function renderDetailViewSubline(post, hideWhen) {
   );
 }
 
-function renderPostHeaderLink(post, showLinksInNewTab) {
+function renderPostHeaderLink(post, showLinksInNewTab, onClickTitle) {
   const href = cleanPostHREF(mobilify(post.cleanUrl));
 
   if (!href) {
@@ -312,6 +323,7 @@ function renderPostHeaderLink(post, showLinksInNewTab) {
       href={ href }
       target={ target }
       outboundLink={ post.outboundLink }
+      onClick={ onClickTitle }
     >
       { cleanPostDomain(post.domain) }
       <span className='PostHeader__post-link-icon icon icon-linkout blue' />
@@ -319,7 +331,7 @@ function renderPostHeaderLink(post, showLinksInNewTab) {
   );
 }
 
-function renderPostTitleLink(post, showLinksInNewTab) {
+function renderPostTitleLink(post, showLinksInNewTab, onClickTitle) {
   const linkExternally = post.promoted && !post.isSelf;
   const url = linkExternally ? post.cleanUrl : cleanPostHREF(mobilify(post.cleanPermalink));
   const { title } = post;
@@ -330,6 +342,7 @@ function renderPostTitleLink(post, showLinksInNewTab) {
   const props = { 
     className: titleLinkClass,
     href: url,
+    onClick: onClickTtile,
     target, 
   };
 
@@ -361,6 +374,8 @@ export default function PostHeader(props) {
     showingLink,
     renderMediaFullbleed,
     showLinksInNewTab,
+    onClickPostDescriptor,
+    onClickTitle,
   } = props;
 
   const showSourceLink = showingLink && !renderMediaFullbleed;
@@ -376,9 +391,10 @@ export default function PostHeader(props) {
           hideSubredditLabel,
           hideWhen,
           isPromotedUserPost,
+          onClickPostDescriptor,
         )
       }
-      { renderPostTitleLink(post, showLinksInNewTab) }
+      { renderPostTitleLink(post, showLinksInNewTab, onClickTitle) }
       { showSourceLink ? renderPostHeaderLink(post, showLinksInNewTab) : null }
       { single && !isPromotedUserPost ? renderDetailViewSubline(post, hideWhen) : null }
     </header>

@@ -96,6 +96,7 @@ export default class PostContent extends React.Component {
     showNSFW: T.bool.isRequired,
     editing: T.bool,
     editPending: T.bool,
+    onAdClickContent: T.func,
     onToggleEdit: T.func.isRequired,
     onUpdateSelftext: T.func.isRequired,
     forceHTTPS: T.bool.isRequired,
@@ -106,6 +107,7 @@ export default class PostContent extends React.Component {
   static defaultProps = {
     editing: false,
     editPending: false,
+    onAdClickContent: () => {},
   };
 
   constructor(props) {
@@ -517,6 +519,7 @@ export default class PostContent extends React.Component {
         href={ href }
         target={ target }
         outboundLink={ this.props.post.outboundLink }
+        onClick={ onAdClickContent }
       >
         <span className='PostContent__link-bar-text'>{ displayText }</span>
         <span className='PostContent__link-bar-icon icon icon-linkout blue' />

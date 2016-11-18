@@ -1,3 +1,4 @@
+
 import omit from 'lodash/omit';
 import values from 'lodash/values';
 import url from 'url';
@@ -166,4 +167,12 @@ export const logClientAdblock = (method, placementIndex, state) => {
   };
 
   getEventTracker().track('ad_serving_events', 'cs.adblock', payload);
+};
+
+export const trackAdInteractionEvent = (event_topic, state) => {
+  console.log('trackingAdInteractionEvent ', event_topic);
+  getEventTracker().track('ad_interaction_events', event_topic, {
+    ...getBasePayload(state),
+    ...buildSubredditData(state),
+  });
 };

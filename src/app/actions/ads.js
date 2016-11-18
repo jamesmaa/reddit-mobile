@@ -5,8 +5,7 @@ import config from 'config';
 import { apiOptionsFromState } from 'lib/apiOptionsFromState';
 import isFakeSubreddit from 'lib/isFakeSubreddit';
 import adLocationForPostRecords from 'lib/adLocationForPostRecords';
-import { logClientAdblock } from 'lib/eventUtils';
-
+import { logClientAdblock, trackAdInteractionEvent } from 'lib/eventUtils';
 
 const { PostsEndpoint } = endpoints;
 const { PostModel } = models;
@@ -40,13 +39,32 @@ export const failed = (adId, error) => ({
   error,
 });
 
-export const TRACKING_AD = 'TRACKING_AD';
-export const tracking = adId => ({
-  type: TRACKING_AD,
+export const TRACKING_AD_IMP = 'TRACKING_AD_IMP';
+export const trackingAdImp = adId => ({
+  type: TRACKING_AD_IMP,
   adId,
 });
 
-export const track = adId => async (dispatch, getState) => {
+export const TRACKING_AD_CLICK_POST_DESCRIPTOR = 'TRACKING_AD_CLICK_POST_DESCRIPTOR';
+export const trackingAdClickPostDescriptor = adId => ({
+  type: TRACKING_AD_CLICK_POST_DESCRIPTOR,
+  adId,
+});
+
+export const TRACKING_AD_CLICK_TITLE = 'TRACKING_AD_CLICK_TITLE';
+export const trackingAdClickTitle = adId => ({
+  type: TRACKING_AD_CLICK_TITLE,
+  adId,
+});
+
+export const TRACKING_AD_CLICK_COMMENTS = 'TRACKING_AD_CLICK_COMMENTS';
+export const trackingAdClickComments = adId => ({
+  type: TRACKING_AD_CLICK_COMMENTS,
+  adId,
+});
+
+
+export const trackImpression = adId => async (dispatch, getState) => {
   const state = getState();
   const adRequest = state.adRequests[adId];
 
@@ -54,14 +72,33 @@ export const track = adId => async (dispatch, getState) => {
     return;
   }
 
-  dispatch(tracking(adId));
+  dispatch(trackingAdImp(adId));
 
   const post = state.posts[adRequest.ad.uuid];
-  trackAdPost(post);
+  fireImpPixels(post);
+  trackAdInteractionEvent('cs.ad_impression', state);
+};
+
+export const trackClickPostDescriptor = adId => async (dispatch, getState) => {
+  console.log('trackClickPostDescriptor');
+  dispatch(trackingAdClickPostDescriptor(adId));
+  trackAdInteractionEvent('cs.ad_click_post_descriptor', getState());
+};
+
+export const trackClickTitle = adId => async (dispatch, getState) => {
+  console.log('trackClickTitle');
+  dispatch(trackingAdClickTitle(adId));
+  trackAdInteractionEvent('cs.ad_click_title', getState());
+};
+
+export const trackClickComments = adId => async (dispatch, getState) => {
+  console.log('trackClickComments');
+  dispatch(trackingAdClickComments(adId));
+  trackAdInteractionEvent('cs.ad_click_comments', getState());
 };
 
 const IMPRESSION_PROPS = ['impPixel', 'adserverImpPixel'];
-const trackAdPost = post => {
+const fireImpPixels = post => {
   IMPRESSION_PROPS.forEach(prop => {
     const pixel = new Image();
     pixel.src = post[prop];

@@ -69,7 +69,7 @@ PostHeader.propTypes = {
 };
 
 PostHeader.defaultProps = {
-  onClickPostDescriptor: () => { console.log('stubbed pup '); },
+  onClickPostDescriptor: () => {},
   onClickTitle: () => {},
 };
 
@@ -342,7 +342,7 @@ function renderPostTitleLink(post, showLinksInNewTab, onClickTitle) {
   const props = { 
     className: titleLinkClass,
     href: url,
-    onClick: onClickTtile,
+    onClick: onClickTitle,
     target, 
   };
 

@@ -170,7 +170,6 @@ export const logClientAdblock = (method, placementIndex, state) => {
 };
 
 export const trackAdInteractionEvent = (event_topic, state) => {
-  console.log('trackingAdInteractionEvent ', event_topic);
   getEventTracker().track('ad_interaction_events', event_topic, {
     ...getBasePayload(state),
     ...buildSubredditData(state),

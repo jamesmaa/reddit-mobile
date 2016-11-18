@@ -80,19 +80,16 @@ export const trackImpression = adId => async (dispatch, getState) => {
 };
 
 export const trackClickPostDescriptor = adId => async (dispatch, getState) => {
-  console.log('trackClickPostDescriptor');
   dispatch(trackingAdClickPostDescriptor(adId));
   trackAdInteractionEvent('cs.ad_click_post_descriptor', getState());
 };
 
 export const trackClickTitle = adId => async (dispatch, getState) => {
-  console.log('trackClickTitle');
   dispatch(trackingAdClickTitle(adId));
   trackAdInteractionEvent('cs.ad_click_title', getState());
 };
 
 export const trackClickComments = adId => async (dispatch, getState) => {
-  console.log('trackClickComments');
   dispatch(trackingAdClickComments(adId));
   trackAdInteractionEvent('cs.ad_click_comments', getState());
 };

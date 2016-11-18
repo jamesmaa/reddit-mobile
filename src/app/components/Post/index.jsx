@@ -57,9 +57,9 @@ Post.defaultProps = {
   subredditIsNSFW: false,
   showOver18Interstitial: false,
   winWidth: 360,
-  onClickPostDescriptor: () => { console.log('stubbed click post descript'); },
-  onClickTitle: () => { console.log('stubbed click post title'); },
-  onClickComments: () => { console.log('stubbed click post comments'); },
+  onClickPostDescriptor: () => {},
+  onClickTitle: () => {},
+  onClickComments: () => {},
   onToggleSavePost: () => {},
   onToggleHidePost: () => {},
 };
